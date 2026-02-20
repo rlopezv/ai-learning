@@ -3,7 +3,7 @@ import numpy as np
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-documents = [
+DOCUMENTS = [
     "El gato duerme en el sofá",
     "Los perros son animales leales",
     "La inteligencia artificial está transformando el mundo",
@@ -11,31 +11,34 @@ documents = [
     "El avión despega a las 10 de la mañana"
 ]
 
-doc_embeddings = model.encode(documents)
+DOC_EMBEDDINGS = model.encode(DOCUMENTS)
+
 
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-def search(query):
+
+def search(query: str, top_k: int = 3):
     query_embedding = model.encode(query)
 
     similarities = [
         cosine_similarity(query_embedding, doc_emb)
-        for doc_emb in doc_embeddings
+        for doc_emb in DOC_EMBEDDINGS
     ]
 
     results = sorted(
-        list(zip(documents, similarities)),
+        list(zip(DOCUMENTS, similarities)),
         key=lambda x: x[1],
         reverse=True
     )
 
-    return results
+    return results[:top_k]
+
 
 if __name__ == "__main__":
     query = input("Pregunta: ")
     results = search(query)
 
     print("\nResultados:")
-    for doc, score in results[:3]:
+    for doc, score in results:
         print(f"{score:.4f} - {doc}")
