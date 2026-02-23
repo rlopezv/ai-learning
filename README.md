@@ -1,4 +1,10 @@
-# Day 2 Complete
+# AI Learning - RAG Mejorado
 
+Incluye:
+- Chunking
+- Mejor prompt
+- Control de contexto
+- Filtro por score
+
+Run:
 python -m src.main
-python -m pytest -v

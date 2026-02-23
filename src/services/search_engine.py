@@ -1,9 +1,7 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
-import logging
 from typing import List, Tuple
-
-logger = logging.getLogger(__name__)
+from src.ingestion.chunker import chunk_text
 
 def normalize(vector: np.ndarray) -> np.ndarray:
     norm = np.linalg.norm(vector)
@@ -16,8 +14,15 @@ class SemanticSearchEngine:
         self.embeddings: np.ndarray | None = None
 
     def index(self, documents: List[str]) -> None:
-        self.documents = documents
-        embeddings = self.model.encode(documents)
+        all_chunks = []
+
+        for doc in documents:
+            chunks = chunk_text(doc)
+            all_chunks.extend(chunks)
+
+        self.documents = all_chunks
+
+        embeddings = self.model.encode(all_chunks)
         self.embeddings = np.array([normalize(e) for e in embeddings])
 
     def search(self, query: str, top_k: int = 3, min_score: float = 0.3):

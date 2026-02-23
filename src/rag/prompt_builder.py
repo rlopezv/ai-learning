@@ -1,7 +1,8 @@
 def build_prompt(query: str, context_docs: list[str]) -> str:
-    context = "\n".join(context_docs)
+    context = "\n---\n".join(context_docs)
 
-    return f"""Eres un asistente que responde usando solo el contexto proporcionado.
+    return f"""Responde a la pregunta usando SOLO el contexto proporcionado.
+Si no encuentras la respuesta, di: "No tengo suficiente información".
 
 Contexto:
 {context}
@@ -9,4 +10,4 @@ Contexto:
 Pregunta:
 {query}
 
-Respuesta:"""
+Respuesta clara y concisa:"""
