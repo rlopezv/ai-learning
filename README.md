@@ -1,19 +1,4 @@
-# AI Learning - Semantic Search (PRO)
+# Day 2 Complete
 
-Versión profesional del sistema de búsqueda semántica.
-
-## 🚀 Run
-
-python src/main.py
-
-## 🧪 Tests
-
-pytest -v
-
-## 🧠 Features
-
-- Motor de búsqueda semántica estructurado
-- Dependency Injection
-- Logging
-- Tests
-- Preparado para RAG
+python -m src.main
+python -m pytest -v

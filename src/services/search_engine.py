@@ -5,10 +5,9 @@ from typing import List, Tuple
 
 logger = logging.getLogger(__name__)
 
-
 def normalize(vector: np.ndarray) -> np.ndarray:
-    return vector / np.linalg.norm(vector)
-
+    norm = np.linalg.norm(vector)
+    return vector if norm == 0 else vector / norm
 
 class SemanticSearchEngine:
     def __init__(self, model: SentenceTransformer):
@@ -19,18 +18,15 @@ class SemanticSearchEngine:
     def index(self, documents: List[str]) -> None:
         logger.info("Indexando documentos...")
         self.documents = documents
-
         embeddings = self.model.encode(documents)
         self.embeddings = np.array([normalize(e) for e in embeddings])
-
         logger.info(f"{len(documents)} documentos indexados")
 
-    def search(self, query: str, top_k: int = 3) -> List[Tuple[str, float]]:
+    def search(self, query: str, top_k: int = 3, min_score: float = 0.3) -> List[Tuple[str, float]]:
         if self.embeddings is None:
             raise ValueError("El índice no ha sido inicializado")
 
-        logger.info(f"Buscando: {query}")
-
+        logger.info(f"Query: {query}")
         query_embedding = normalize(self.model.encode(query))
         similarities = np.dot(self.embeddings, query_embedding)
 
@@ -39,8 +35,12 @@ class SemanticSearchEngine:
         results = [
             (self.documents[i], float(similarities[i]))
             for i in top_indices
+            if similarities[i] >= min_score
         ]
 
-        logger.info(f"Top {top_k} resultados obtenidos")
+        if not results:
+            logger.info("No se encontraron resultados relevantes")
+            return [("No se encontraron resultados relevantes", 0.0)]
 
+        logger.info(f"Top score: {max(similarities):.4f}")
         return results

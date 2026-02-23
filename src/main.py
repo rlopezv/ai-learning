@@ -2,10 +2,12 @@ import logging
 from sentence_transformers import SentenceTransformer
 
 from src.services.search_engine import SemanticSearchEngine
-from src.core.config import MODEL_NAME, TOP_K_DEFAULT
+from src.core.config import MODEL_NAME, TOP_K_DEFAULT, MIN_SCORE_DEFAULT
 
-logging.basicConfig(level=logging.INFO)
-
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 def main():
     model = SentenceTransformer(MODEL_NAME)
@@ -26,12 +28,11 @@ def main():
         if query.lower() == "exit":
             break
 
-        results = engine.search(query, TOP_K_DEFAULT)
+        results = engine.search(query, TOP_K_DEFAULT, MIN_SCORE_DEFAULT)
 
         print("\nResultados:")
         for doc, score in results:
             print(f"{score:.4f} - {doc}")
-
 
 if __name__ == "__main__":
     main()
