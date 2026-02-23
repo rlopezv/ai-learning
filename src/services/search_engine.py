@@ -16,17 +16,14 @@ class SemanticSearchEngine:
         self.embeddings: np.ndarray | None = None
 
     def index(self, documents: List[str]) -> None:
-        logger.info("Indexando documentos...")
         self.documents = documents
         embeddings = self.model.encode(documents)
         self.embeddings = np.array([normalize(e) for e in embeddings])
-        logger.info(f"{len(documents)} documentos indexados")
 
-    def search(self, query: str, top_k: int = 3, min_score: float = 0.3) -> List[Tuple[str, float]]:
+    def search(self, query: str, top_k: int = 3, min_score: float = 0.3):
         if self.embeddings is None:
-            raise ValueError("El índice no ha sido inicializado")
+            raise ValueError("Index no inicializado")
 
-        logger.info(f"Query: {query}")
         query_embedding = normalize(self.model.encode(query))
         similarities = np.dot(self.embeddings, query_embedding)
 
@@ -39,8 +36,6 @@ class SemanticSearchEngine:
         ]
 
         if not results:
-            logger.info("No se encontraron resultados relevantes")
             return [("No se encontraron resultados relevantes", 0.0)]
 
-        logger.info(f"Top score: {max(similarities):.4f}")
         return results

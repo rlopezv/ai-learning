@@ -1,19 +1,13 @@
-import logging
 from sentence_transformers import SentenceTransformer
-
 from src.services.search_engine import SemanticSearchEngine
-from src.core.config import MODEL_NAME, TOP_K_DEFAULT, MIN_SCORE_DEFAULT
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+from src.core.config import MODEL_NAME
+from src.rag.rag_pipeline import RAGPipeline
 
 def main():
     model = SentenceTransformer(MODEL_NAME)
     engine = SemanticSearchEngine(model)
 
-    documents = [
+    docs = [
         "El gato duerme en el sofá",
         "Los perros son animales leales",
         "La inteligencia artificial está transformando el mundo",
@@ -21,18 +15,15 @@ def main():
         "El avión despega a las 10 de la mañana"
     ]
 
-    engine.index(documents)
+    engine.index(docs)
+    rag = RAGPipeline(engine)
 
     while True:
-        query = input("\nPregunta (o 'exit'): ")
-        if query.lower() == "exit":
+        q = input("\nPregunta (exit para salir): ")
+        if q == "exit":
             break
 
-        results = engine.search(query, TOP_K_DEFAULT, MIN_SCORE_DEFAULT)
-
-        print("\nResultados:")
-        for doc, score in results:
-            print(f"{score:.4f} - {doc}")
+        print(rag.run(q))
 
 if __name__ == "__main__":
     main()
