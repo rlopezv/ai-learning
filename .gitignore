@@ -1,36 +1,25 @@
-# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 *.log
 
-# Virtual env
 venv/
 .env/
 
-# VS Code
 .vscode/
 
-# OS
 .DS_Store
 Thumbs.db
 
-# Docker
-*.tar
-
-# Models cache
 .cache/
 *.bin
 *.pt
 *.onnx
 
-# HuggingFace cache
 ~/.cache/huggingface/
 
-# Testing
 .pytest_cache/
 coverage/
 
-# Devcontainer override
 .devcontainer/*.local.json

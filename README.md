@@ -1,28 +1,19 @@
-# AI Learning - Semantic Search
+# AI Learning - Semantic Search (PRO)
 
-Proyecto base para aprender embeddings y búsqueda semántica.
+Versión profesional del sistema de búsqueda semántica.
 
-## 🚀 Setup
+## 🚀 Run
 
-docker build -t ai-learning .
-docker run -it -v $(pwd):/app ai-learning
-
-## ▶️ Uso
-
-python src/semantic_search.py
+python src/main.py
 
 ## 🧪 Tests
 
-pytest
+pytest -v
 
-## 🧠 Qué incluye
+## 🧠 Features
 
-- Embeddings con Sentence Transformers
-- Búsqueda semántica con cosine similarity
-- Entorno Docker + DevContainer
-
-## 📌 Próximos pasos
-
-- RAG con documentos
-- API con FastAPI
-- Vector DB
+- Motor de búsqueda semántica estructurado
+- Dependency Injection
+- Logging
+- Tests
+- Preparado para RAG
