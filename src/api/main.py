@@ -1,10 +1,23 @@
-from sentence_transformers import SentenceTransformer
+from fastapi import FastAPI
+from pydantic import BaseModel
+
 from src.services.search_engine import SemanticSearchEngine
 from src.rag.rag_pipeline import RAGPipeline
+from sentence_transformers import SentenceTransformer
+
+app = FastAPI()
 
 MODEL = "all-MiniLM-L6-v2"
 
-def main():
+class Query(BaseModel):
+    query: str
+
+engine = None
+rag = None
+
+@app.on_event("startup")
+def startup():
+    global engine, rag
     model = SentenceTransformer(MODEL)
     engine = SemanticSearchEngine(model)
 
@@ -17,11 +30,10 @@ def main():
     engine.index(docs)
     rag = RAGPipeline(engine)
 
-    while True:
-        q = input("Pregunta: ")
-        if q == "exit":
-            break
-        print(rag.run(q))
+@app.post("/query")
+def query(q: Query):
+    return {"response": rag.run(q.query)}
 
-if __name__ == "__main__":
-    main()
+@app.get("/health")
+def health():
+    return {"status": "ok"}

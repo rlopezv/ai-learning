@@ -1,9 +1,20 @@
-from transformers import pipeline
+import requests
+import os
 
 class Generator:
-    def __init__(self):
-        self.generator = pipeline("text-generation", model="distilgpt2")
+    def __init__(self, model: str = "mistral"):
+        self.model = model
+        base_url = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+        self.url = f"{base_url}/api/generate"
 
     def generate(self, prompt: str) -> str:
-        result = self.generator(prompt, max_length=200, num_return_sequences=1)
-        return result[0]["generated_text"]
+        response = requests.post(
+            self.url,
+            json={
+                "model": self.model,
+                "prompt": prompt,
+                "stream": False
+            }
+        )
+        response.raise_for_status()
+        return response.json()["response"]

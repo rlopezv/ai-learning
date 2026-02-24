@@ -1,18 +1,20 @@
 {
-  "name": "AI Learning Env",
-  "build": {
-    "dockerfile": "../Dockerfile"
-  },
-  "workspaceFolder": "/app",
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/app,type=bind"
+  "name": "AI Learning (Compose)",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
   ],
-  "postCreateCommand": "pip install -r requirements-dev.txt",
+  "service": "app",
+  "workspaceFolder": "/app",
+  "shutdownAction": "stopCompose",
+  "overrideCommand": false,
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-python.python"
+        "ms-python.python",
+        "ms-python.debugpy"
       ]
     }
-  }
+  },
+
+  "remoteUser": "root"
 }

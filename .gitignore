@@ -3,6 +3,7 @@ __pycache__/
 *.log
 venv/
 .env/
+.venv/
 .vscode/
 .cache/
 .pytest_cache/
