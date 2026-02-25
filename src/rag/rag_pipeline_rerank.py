@@ -11,19 +11,35 @@ class RAGPipelineRerank:
         self.reranker = CrossEncoderReranker()
 
     def run(self, query):
-        # 1. retrieval (recall alto)
+        # 1. retrieval
         results = self.search_engine.search(query, top_k=10)
 
-        #docs = [doc for doc, _ in results]
-        docs = [r["text"] for r in results]        
+        docs = [r["text"] for r in results]
 
-        # 2. re-ranking (precisión)
+        # 2. rerank
         top_docs = self.reranker.rerank(query, docs, top_k=3)
 
-        # 3. prompt + generación
-        prompt = build_prompt(query, top_docs)
+        # 🔥 mapear docs → metadata
+        selected = []
+        for doc in top_docs:
+            for r in results:
+                if r["text"] == doc:
+                    selected.append(r)
+                    break
 
-        print("Docs before rerank:", docs)
-        print("Docs after rerank:", top_docs)
+        # 3. construir prompt
+        prompt = build_prompt(query, [s["text"] for s in selected])
 
-        return self.generator.generate(prompt)
+        answer = self.generator.generate(prompt)
+
+        # 4. añadir fuentes
+        sources = []
+        for s in selected:
+            meta = s.get("metadata")
+            if meta:
+                sources.append(f"{meta.source} (pág. {meta.page})")
+
+        return {
+            "answer": answer,
+            "sources": list(set(sources))  # eliminar duplicados
+        }

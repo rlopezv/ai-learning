@@ -2,16 +2,16 @@ from sentence_transformers import SentenceTransformer
 
 from src.services.search_engine import SemanticSearchEngine
 from src.rag.rag_pipeline_rerank import RAGPipelineRerank
-from src.ingestion.pipeline import ingest_pdf
+from src.ingestion.multi_loader import ingest_folder
 
 
 MODEL = "all-MiniLM-L6-v2"
 
 
-def load_documents(engine, pdf_path: str):
-    print(f"📄 Cargando PDF: {pdf_path}")
+def load_documents(engine, folder_path: str):
+    print(f"📂 Cargando documentos desde: {folder_path}")
 
-    chunks = ingest_pdf(pdf_path)
+    chunks = ingest_folder(folder_path)
 
     print(f"✅ {len(chunks)} chunks generados")
 
@@ -32,22 +32,35 @@ def interactive_loop(rag):
         if query.lower() == "exit":
             break
 
-        result = rag.search_engine.search(query, top_k=5)
+        # 🔍 Mostrar contexto recuperado
+        results = rag.search_engine.search(query, top_k=5)
 
         print("\n🔍 Contexto recuperado:")
-        for r in result:
+        for r in results:
             meta = r.get("metadata")
-            print(f"- Página {meta.page} | Score: {r['score']:.2f}")
 
-        answer = rag.run(query)
+            if meta:
+                print(
+                    f"- {meta.source} | pág. {meta.page} | score {r['score']:.2f}"
+                )
+            else:
+                print(f"- score {r['score']:.2f}")
+
+        # 🤖 Ejecutar RAG
+        result = rag.run(query)
 
         print("\n💡 Respuesta:")
-        print(answer)
-        print("\n" + "=" * 50)
+        print(result["answer"])
+
+        print("\n📚 Fuentes:")
+        for s in result["sources"]:
+            print("-", s)
+
+        print("\n" + "=" * 60)
 
 
 def main():
-    print("🚀 Inicializando sistema RAG...")
+    print("🚀 Inicializando sistema RAG multi-documento...")
 
     # 1. Modelo embeddings
     model = SentenceTransformer(MODEL)
@@ -55,11 +68,11 @@ def main():
     # 2. Search engine
     engine = SemanticSearchEngine(model)
 
-    # 3. Cargar documentos
-    pdf_path = "data/sample.pdf"  # 👈 cambia aquí si quieres
-    load_documents(engine, pdf_path)
+    # 3. Cargar documentos (multi-PDF)
+    folder_path = "data/"  # 👈 carpeta con PDFs
+    load_documents(engine, folder_path)
 
-    # 4. RAG pipeline (con reranking)
+    # 4. Pipeline RAG (con reranking + fuentes)
     rag = RAGPipelineRerank(engine)
 
     # 5. Loop interactivo
