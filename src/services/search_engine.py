@@ -18,4 +18,12 @@ class SemanticSearchEngine:
         qemb = normalize(self.model.encode(q))
         sims = np.dot(self.embs, qemb)
         idx = sims.argsort()[::-1][:top_k]
-        return [(self.docs[i], float(sims[i])) for i in idx]
+        #return [(self.docs[i], float(sims[i])) for i in idx]
+        return [
+            {
+                "text": self.docs[i],
+                "score": float(sims[i]),
+                "metadata": self.metadata[i] if hasattr(self, "metadata") else None
+            }
+            for i in idx
+        ]        

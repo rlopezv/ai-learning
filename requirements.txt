@@ -1,5 +1,7 @@
+pypdf
+pytesseract
+pdf2image
+Pillow
 sentence-transformers
 numpy
 requests
-fastapi
-uvicorn
